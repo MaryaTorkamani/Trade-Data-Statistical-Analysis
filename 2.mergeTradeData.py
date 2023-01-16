@@ -2,15 +2,8 @@
 from initailFunctionsPath import *
 
 #%%
-conf = SparkConf()
-conf.set("spark.driver.memory", "240g").set(
-    "spark.shuffle.service.index.cache.size", "1g"
-).set('spark.executer.cores', '80').setAppName(
-    "Practice"
-) 
-sc = SparkContext.getOrCreate(conf=conf)
-spark = SparkSession(sc)
-#%%
+
+# columns are defined
 columns =  [
     'date'
     ,'ticket'
@@ -28,12 +21,14 @@ columns =  [
 
 files = [x for x in os.listdir(PATH_TRADE)]# if int(x[15:23]) >= 14000511]
 print(files[0])
+
 raw_trade_df = (
-    spark.read.parquet(PATH_TRADE + files[0])
-   
+    spark.read.parquet(PATH_TRADE + files[0]) 
 )
+
 raw_trade_df = raw_trade_df.select(*columns)
 
+# We want to union all files
 for file in files[1:]:
     df = (
         spark.read.parquet(PATH_TRADE + file)
@@ -42,15 +37,11 @@ for file in files[1:]:
     raw_trade_df = raw_trade_df.union(df)
     print(file,df.count())
 
-
 display_df(raw_trade_df)
 #%%
-# window = Window.partitionBy(raw_trade_df['symbol']).orderBy(raw_trade_df['date'].desc())
-# raw_trade_df = (raw_trade_df.select('*', F.rank().over(window).alias('rank')) 
-#   .filter(F.col('rank') <= 1) 
-#  )
-# raw_trade_df.count()
-#%%
+
+# Settlement value is the total valu of the trade in Rial.
+# Some of settlement values are missed when reading from database. We want to replace them with the correct value. We also change the name of the columns.
 raw_trade_df = (
     raw_trade_df.withColumn(
         "settlementValue",
@@ -75,13 +66,15 @@ raw_trade_df = (
     )
     .dropDuplicates()
 )
+#%%
 
-# raw_trade_df = replace_arabic_characters_and_correct_symbol_names(raw_trade_df)
+# Replacing the Arabic character with Persian characters
+raw_trade_df = replace_arabic_characters_and_correct_symbol_names(raw_trade_df)
 
 display_df(raw_trade_df)
-# some settlement values are zero!
-# capital increas?
+
 #%%
+# Saving the dataframe into parquet files
 raw_trade_df.write.mode('overwrite').parquet(PRICE_PATH + "/mergedCleanedTradeData.parquet")
 # %%
-del raw_trade_df
+
