@@ -1,14 +1,6 @@
 from initailFunctionsPath import *
 #%%
-conf = SparkConf()
-conf.set("spark.driver.memory", "130g").set(
-    "spark.shuffle.service.index.cache.size", "1g"
-).setAppName(
-    "Practice"
-)  # .set('spark.executer.cores', '58')
-sc = SparkContext.getOrCreate(conf=conf)
-spark = SparkSession(sc)
-#%%
+
 raw_portfolio_df = spark.read.parquet(PATH_PORTFOLIO + "{}".format("raw_portfolio.parquet"))
 display_df(raw_portfolio_df)
 #%%
