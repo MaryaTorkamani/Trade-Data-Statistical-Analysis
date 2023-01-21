@@ -1,17 +1,8 @@
 #%%
 from initailFunctionsPath import *
+#%%
 
-conf = SparkConf()
-conf.set("spark.driver.memory", "10g").set(
-    "spark.shuffle.service.index.cache.size", "1g"
-).setAppName(
-    "Practice"
-)  # .set('spark.executer.cores', '58')
-sc = SparkContext.getOrCreate(conf=conf)
-spark = SparkSession(sc)
-#%%
-VALID_SYMBOLS_PATH
-#%%
+# Loading the valid symbols
 valid_symbols_df = (
     spark.read.parquet(VALID_SYMBOLS_PATH + "/{}".format("Symbols_14001116.parquet"))
     .select("Ticker")
@@ -19,11 +10,13 @@ valid_symbols_df = (
     .dropDuplicates()
 )
 
+# replacing Arabic characters with Persian ones
 valid_symbols_df = replace_arabic_characters_and_correct_symbol_names(valid_symbols_df)
 
 display_df(valid_symbols_df)
-
 #%%
+
+# Adding ETFs to valid symbols
 ETFs = [
     "آتیمس",
     "آرمانی",
@@ -108,11 +101,12 @@ ETFs = [
     "فیروزه",
 ]
 ETFs = [(i,) for i in ETFs]
-ETFs = spark.createDataFrame(data=ETFs, schema=valid_symbols_df.schema)
+ETFs = spark.createDataFrame(data = ETFs, schema = valid_symbols_df.schema)
 valid_symbols_df = valid_symbols_df.union(ETFs).dropDuplicates()
 display_df(valid_symbols_df)
+#%%
 
-
+# Adding right offers to valid symbols
 right_offers = [
     "آ س پح",
     "آرمانح",
@@ -636,18 +630,21 @@ right_offers = [(i,) for i in right_offers]
 right_offers = spark.createDataFrame(data=right_offers, schema=valid_symbols_df.schema)
 valid_symbols_df = valid_symbols_df.union(right_offers).dropDuplicates()
 display_df(valid_symbols_df)
+#%%
 
+# Adding some other symbols valid symbols
 handly_collected_valid_symbols = ["فسلير", "نگین", "نیرو", "غگز", "آینده"]
 handly_collected_valid_symbols = [(i,) for i in handly_collected_valid_symbols]
 handly_collected_valid_symbols = spark.createDataFrame(
-    data=handly_collected_valid_symbols, schema=valid_symbols_df.schema
+    data = handly_collected_valid_symbols, schema = valid_symbols_df.schema
 )
 valid_symbols_df = valid_symbols_df.union(
     handly_collected_valid_symbols
 ).dropDuplicates()
 display_df(valid_symbols_df)
+#%%
 
-
+# removing invalid symbols
 invalid_symbols = [
     "وکوثر",
     "حکمت",
@@ -687,6 +684,8 @@ invalid_symbols = [
 valid_symbols_df = valid_symbols_df.filter(~F.col("symbol").isin(invalid_symbols))
 display_df(valid_symbols_df)
 #%%
+
+# saving the dataframe into parquet files
 valid_symbols_df.write.mode("overwrite").parquet(
     VALID_SYMBOLS_PATH + "/{}".format("validSymbols.parquet")
 )
