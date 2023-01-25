@@ -14,10 +14,10 @@ from functools import reduce
 from pyspark.sql.window import Window
 #%%
 
-PATH_TRADE = r"C:/Users/Administrator/Heidari_Ra/Data/raw_trade/"
-PRICE_PATH = r"C:/Users/Administrator/Heidari_Ra/Data/"
-VALID_SYMBOLS_PATH = r"C:/Users/Administrator/Heidari_Ra/Data/"
-PATH_OUTPUT = r"C:/Users/Administrator/Heidari_Ra/Outputs/"
+PATH_TRADE = r"YOUR PATH"
+PRICE_PATH = r"YOUR PATH"
+VALID_SYMBOLS_PATH = r"YOUR PATH"
+PATH_OUTPUT = r"YOUR PATH"
 PATH_PORTFOLIO = PRICE_PATH
 #%%
 
@@ -35,8 +35,8 @@ spark = SparkSession(sc)
 HOUR_SECONDS = 60 * 60
 MINUTE_SECONDS = 60
 
-MIN_ANALYSIS_DATE = 13980101
-MAX_ANALYSIS_DATE = 14001128
+MIN_ANALYSIS_DATE = 13000101 #INITIAL_DATE
+MAX_ANALYSIS_DATE = 14001230 #END_DATE
 
 N_QUANTILES = 10
 #%%
