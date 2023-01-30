@@ -46,3 +46,4 @@ One of the greatest challenges dealing with this data was creating daily and mon
 initial portfolio, when adding up total shares, some of the account-symbols became negative. This was, probably, due to the transfers other than trades (for example 
 converting right offers to shares). Further, we deal with this challenge differently. For now, we only put a tag on account-symbols that become negative. 
 Moreover, we adjust the number of shares in each portfolio.
+--
